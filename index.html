@@ -20,7 +20,7 @@
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import{getFirestore,doc,setDoc,getDoc,addDoc,collection,query,orderBy,limit,onSnapshot,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-const firebaseConfig={apiKey:"AIzaSyBZAKWocY_UdZYlxvmgBY2bvHNGQmURo",authDomain:"dls-forum-players.firebaseapp.com",projectId:"dls-forum-players",storageBucket:"dls-forum-players.firebasestorage.app",messagingSenderId:"161092611096",appId:"1:161092611096:web:9ecca0e756c77017f5a76d"};
+const firebaseConfig={apiKey:"AIzaSyBZAKwOcy_UdZYlxvmgBYI22bvHNGQmURo",authDomain:"dls-forum-players.firebaseapp.com",projectId:"dls-forum-players",storageBucket:"dls-forum-players.firebasestorage.app",messagingSenderId:"161092611096",appId:"1:161092611096:web:9ecca0e756c77017f5a76d"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);let currentUser=null,profile=null,unsubs=[];
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function msg(id,t,cls=""){const e=$(id);e.textContent=t;e.className="small "+cls}
