@@ -118,69 +118,61 @@
     }
   });
 
-  async function handleAuthSubmit(e){
-    if(e&&e.preventDefault)e.preventDefault();
-    if(!firebaseReady||!auth){
-      say("authMessage","Impossible de contacter Firebase : "+(firebaseInitError||"SDK indisponible."));
-      return;
-    }
-    const email=($("email")?.value||"").trim();
-    const password=$("password")?.value||"";
-    const login=$("nameField")?.classList.contains("hidden")??true;
-    const submitBtn=$("authSubmit");
-    if(submitBtn)submitBtn.disabled=true;
-    say("authMessage",login?"Connexion en cours...":"Création du compte en cours...");
-    try{
-      let cred;
-      if(login){
-        cred=await auth.signInWithEmailAndPassword(email,password);
-      }else{
-        const name=($("name")?.value||"").trim();
-        const team=($("teamName")?.value||"").trim();
-        cred=await auth.createUserWithEmailAndPassword(email,password);
-        if(db&&cred&&cred.user){
-          await db.collection("users").doc(cred.user.uid).set({
-            uid:cred.user.uid,
-            name,
-            team,
-            email,
-            role:"player",
-            createdAt:firebase.firestore.FieldValue.serverTimestamp()
-          });
-        }
-      }
-      if(cred&&cred.user){
-        applyLoggedInUI(cred.user,{name:cred.user.email,team:""});
-      }
-      closeAuthModal();
-      if($("authForm"))$("authForm").reset();
-      say("authMessage","");
-    }catch(err){
-      const code=err&&err.code?err.code:"";
-      const msg=code==="auth/email-already-in-use"
-        ?"Cette adresse possède déjà un compte."
-        :(code==="auth/invalid-credential"||code==="auth/wrong-password"||code==="auth/user-not-found"||code==="auth/invalid-email")
-          ?"E-mail ou mot de passe incorrect."
-          :code==="auth/weak-password"
-            ?"Mot de passe trop court (6 caractères minimum)."
-            :code==="auth/network-request-failed"
-              ?"Erreur réseau : impossible de joindre Firebase."
-              :((err&&err.message)||"Erreur lors de la connexion.");
-      say("authMessage",msg);
-    }finally{
-      if(submitBtn)submitBtn.disabled=false;
-    }
-  }
-
-  if($("authForm"))$("authForm").addEventListener("submit",handleAuthSubmit);
-  if($("authSubmit"))$("authSubmit").addEventListener("click",e=>{
-    if($("authForm")&&typeof $("authForm").requestSubmit==="function"){
+  if($("authForm")){
+    $("authForm").addEventListener("submit",async e=>{
       e.preventDefault();
-      $("authForm").requestSubmit();
-    }
-  });
-
-  if(!firebaseReady)return;
+      if(!firebaseReady||!auth){
+        say("authMessage","Impossible de contacter Firebase : "+(firebaseInitError||"SDK indisponible."));
+        return;
+      }
+      const email=($("email")?.value||"").trim();
+      const password=$("password")?.value||"";
+      const login=$("nameField")?.classList.contains("hidden")??true;
+      const submitBtn=$("authSubmit");
+      if(submitBtn)submitBtn.disabled=true;
+      say("authMessage",login?"Connexion en cours...":"Création du compte en cours...");
+      try{
+        let cred;
+        if(login){
+          cred=await auth.signInWithEmailAndPassword(email,password);
+        }else{
+          const name=($("name")?.value||"").trim();
+          const team=($("teamName")?.value||"").trim();
+          cred=await auth.createUserWithEmailAndPassword(email,password);
+          if(db&&cred&&cred.user){
+            await db.collection("users").doc(cred.user.uid).set({
+              uid:cred.user.uid,
+              name,
+              team,
+              email,
+              role:"player",
+              createdAt:firebase.firestore.FieldValue.serverTimestamp()
+            });
+          }
+        }
+        if(cred&&cred.user){
+          applyLoggedInUI(cred.user,{name:cred.user.email,team:""});
+        }
+        closeAuthModal();
+        $("authForm").reset();
+        say("authMessage","");
+      }catch(err){
+        const code=err&&err.code?err.code:"";
+        const msg=code==="auth/email-already-in-use"
+          ?"Cette adresse possède déjà un compte."
+          :(code==="auth/invalid-credential"||code==="auth/wrong-password"||code==="auth/user-not-found"||code==="auth/invalid-email")
+            ?"E-mail ou mot de passe incorrect."
+            :code==="auth/weak-password"
+              ?"Mot de passe trop court (6 caractères minimum)."
+              :code==="auth/network-request-failed"
+                ?"Erreur réseau : impossible de joindre Firebase."
+                :((err&&err.message)||"Erreur lors de la connexion.");
+        say("authMessage",msg);
+      }finally{
+        if(submitBtn)submitBtn.disabled=false;
+      }
+    });
+  }
 
   function stop(){
     unsubs.forEach(f=>{try{f()}catch(_){}});
@@ -209,6 +201,7 @@
   }
 
   function start(){
+    if(!firebaseReady||!db)return;
     stop();
     window.__dlsResultCache={};
 
@@ -217,4 +210,6 @@
         ?"<p>Aucune publication pour le moment.</p>"
         :s.docs.map(d=>{
             const p=d.data();
-            return `<div class="i
+            return `<div class="item"><b>${esc(p.name||"Joueur")}</b> <span class="small">· ${esc(p.team||"")}</span><p>${esc(p.text).replace(/\n/g,"<br>")}</p></div>`;
+          }).join("");
+      $("statPosts")
