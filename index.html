@@ -1,215 +1,38 @@
 <!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DLS Forum Players</title>
 <style>
-:root{--bg:#07111f;--panel:#101e30;--line:#263c55;--text:#edf5ff;--muted:#9db0c7;--green:#b7f34a;--cyan:#48d9e8}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 Arial,sans-serif}header{position:sticky;top:0;background:#081421f2;border-bottom:1px solid var(--line);z-index:3}.wrap{width:min(1100px,92%);margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 0}.brand{font-size:21px;font-weight:900}.brand span{color:var(--green)}button{border:0;border-radius:9px;padding:10px 14px;font-weight:bold;cursor:pointer;background:var(--green);color:#10200a;touch-action:manipulation}button.secondary,nav button{background:#20364d;color:var(--text)}button.danger{background:#642c38;color:white}button:disabled{opacity:.5}nav{display:flex;gap:6px;overflow:auto;padding-bottom:12px;-webkit-overflow-scrolling:touch}nav button{white-space:nowrap;border:1px solid transparent}nav button.active{color:var(--green);border-color:var(--line)}main{padding:24px 0 55px}.hero,.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:20px;margin-bottom:14px}.hero{background:linear-gradient(120deg,#142b40,#102034)}h1{font-size:clamp(28px,5vw,42px);line-height:1.12;margin:10px 0}h2,h3{margin:0 0 12px}.muted,.small{color:var(--muted)}.small{font-size:12px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.stat{font-size:28px;color:var(--green);font-weight:900}.section{display:none}.section.active{display:block}.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1;min-width:160px}.field{display:grid;gap:5px;margin:10px 0}label{font-size:13px;color:var(--muted)}input,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;background:#091625;color:var(--text);font:inherit}textarea{min-height:95px}.item{padding:12px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}.tag{background:#263d52;color:var(--cyan);border-radius:20px;padding:3px 9px;font-size:12px;display:inline-block}.notice{background:#1a3045;padding:12px;border-radius:9px}.hidden{display:none!important}.modal{display:none;position:fixed;inset:0;background:#000b;z-index:50;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.box{width:min(450px,100%);background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:20px;max-height:90vh;overflow:auto}.modalhead{display:flex;justify-content:space-between;align-items:center}.close{background:transparent;color:var(--muted);font-size:22px;padding:2px 8px}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.actions button{padding:7px 10px;font-size:12px}.stats-panel{margin-top:10px;padding:12px;border-radius:10px;background:#091625;border:1px solid var(--line)}footer{padding:20px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}@media(max-width:700px){.grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+:root{--bg:#07111f;--panel:#101e30;--line:#263c55;--text:#edf5ff;--muted:#9db0c7;--green:#b7f34a;--cyan:#48d9e8}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 Arial,sans-serif}header{position:sticky;top:0;background:#081421f2;border-bottom:1px solid var(--line);z-index:3}.wrap{width:min(1100px,92%);margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 0}.brand{font-size:21px;font-weight:900}.brand span{color:var(--green)}button{border:0;border-radius:9px;padding:10px 14px;font-weight:bold;cursor:pointer;background:var(--green);color:#10200a}button.secondary,nav button{background:#20364d;color:var(--text)}button.danger{background:#642c38;color:white}button:disabled{opacity:.5}nav{display:flex;gap:6px;overflow:auto;padding-bottom:12px}nav button{white-space:nowrap;border:1px solid transparent}nav button.active{color:var(--green);border-color:var(--line)}main{padding:24px 0 55px}.hero,.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:20px;margin-bottom:14px}.hero{background:linear-gradient(120deg,#142b40,#102034)}h1{font-size:clamp(28px,5vw,42px);line-height:1.12;margin:10px 0}h2{margin:0 0 12px}.muted,.small{color:var(--muted)}.small{font-size:12px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.stat{font-size:28px;color:var(--green);font-weight:900}.section{display:none}.section.active{display:block}.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1}.field{display:grid;gap:5px;margin:10px 0}label{font-size:13px;color:var(--muted)}input,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;background:#091625;color:var(--text);font:inherit}textarea{min-height:95px}input[type=file]{padding:9px}.preview{max-width:100%;max-height:220px;border-radius:10px;border:1px solid var(--line);margin-top:8px}.stats-detail{background:#091625;border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:9px}.item{padding:12px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}.tag{background:#263d52;color:var(--cyan);border-radius:20px;padding:3px 9px;font-size:12px}.notice{background:#1a3045;padding:12px;border-radius:9px}.hidden{display:none!important}.modal{display:none;position:fixed;inset:0;background:#000b;z-index:5;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.box{width:min(450px,100%);background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:20px;max-height:90vh;overflow:auto}.modalhead{display:flex;justify-content:space-between;align-items:center}.close{background:transparent;color:var(--muted);font-size:22px;padding:2px 8px}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.actions button{padding:7px 10px;font-size:12px}footer{padding:20px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}@media(max-width:700px){.grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
 </style></head><body>
-<header><div class="wrap"><div class="top"><div class="brand">DLS <span>FORUM PLAYERS</span></div><div class="row" style="flex:0 1 auto;align-items:center"><span id="accountLabel" class="small">Non connecté</span><button class="secondary" id="loginBtn" type="button">Connexion</button><button id="registerBtn" type="button">Créer un compte</button><button class="secondary hidden" id="logoutBtn" type="button">Déconnexion</button></div></div><nav id="nav"><button class="active" data-page="home" type="button">Accueil</button><button data-page="forum" type="button">Forum</button><button data-page="players" type="button">Joueurs</button><button data-page="results" type="button">Résultats DLS</button><button data-page="team" type="button">Équipe type</button><button data-page="awards" type="button">Distinctions</button><button data-page="sponsors" type="button">Sponsors</button><button data-page="admin" id="adminNav" class="hidden" type="button">Administration</button></nav></div></header>
+<header><div class="wrap"><div class="top"><div class="brand">DLS <span>FORUM PLAYERS</span></div><div class="row" style="flex:0 1 auto;align-items:center"><span id="accountLabel" class="small">Non connecté</span><button class="secondary" id="loginBtn">Connexion</button><button id="registerBtn">Créer un compte</button><button class="secondary hidden" id="logoutBtn">Déconnexion</button></div></div><nav id="nav"><button class="active" data-page="home">Accueil</button><button data-page="forum">Forum</button><button data-page="players">Joueurs</button><button data-page="results">Résultats DLS</button><button data-page="team">Équipe type</button><button data-page="awards">Distinctions</button><button data-page="sponsors">Sponsors</button><button data-page="admin" id="adminNav" class="hidden">Administration</button></nav></div></header>
 <main class="wrap">
-<section id="home" class="section active"><div class="hero"><span class="tag">COMMUNAUTÉ DLS</span><h1>Le forum des joueurs.<br><span style="color:var(--green)">La passion du jeu.</span></h1><p class="muted">Partage tes discussions, suis les résultats et découvre les joueurs de la communauté.</p><button id="heroRegister" type="button">Rejoindre le forum</button></div><div class="grid"><div class="card"><div class="muted">Joueurs inscrits</div><div class="stat" id="statPlayers">—</div></div><div class="card"><div class="muted">Publications</div><div class="stat" id="statPosts">—</div></div><div class="card"><div class="muted">Résultats validés</div><div class="stat" id="statResults">—</div></div></div><div class="card"><h2>Bienvenue sur DLS Forum Players</h2><p class="muted">Connecte-toi pour participer au forum, consulter les joueurs et soumettre tes résultats DLS.</p></div></section>
-<section id="forum" class="section"><div class="card"><h2>Forum communautaire</h2><p class="muted">Publie un message pour les autres joueurs.</p><div class="field"><label for="postText">Ton message</label><textarea id="postText" maxlength="2000" placeholder="Écris ton message ici..."></textarea></div><button id="publishBtn" type="button">Publier</button><p id="postMessage" class="small"></p></div><div class="card"><h2>Dernières publications</h2><div id="postsList" class="muted">Connecte-toi pour voir les publications.</div></div></section>
+<section id="home" class="section active"><div class="hero"><span class="tag">COMMUNAUTÉ DLS</span><h1>Le forum des joueurs.<br><span style="color:var(--green)">La passion du jeu.</span></h1><p class="muted">Partage tes discussions, suis les résultats et découvre les joueurs de la communauté.</p><button id="heroRegister">Rejoindre le forum</button></div><div class="grid"><div class="card"><div class="muted">Joueurs inscrits</div><div class="stat" id="statPlayers">—</div></div><div class="card"><div class="muted">Publications</div><div class="stat" id="statPosts">—</div></div><div class="card"><div class="muted">Résultats soumis</div><div class="stat" id="statResults">—</div></div></div><div class="card"><h2>Bienvenue sur DLS Forum Players</h2><p class="muted">Connecte-toi pour participer au forum, consulter les joueurs et soumettre tes résultats DLS.</p></div></section>
+<section id="forum" class="section"><div class="card"><h2>Forum communautaire</h2><p class="muted">Publie un message pour les autres joueurs.</p><div class="field"><label for="postText">Ton message</label><textarea id="postText" maxlength="2000" placeholder="Écris ton message ici..."></textarea></div><button id="publishBtn">Publier</button><p id="postMessage" class="small"></p></div><div class="card"><h2>Dernières publications</h2><div id="postsList" class="muted">Connecte-toi pour voir les publications.</div></div></section>
 <section id="players" class="section"><div class="card"><h2>Joueurs inscrits</h2><div id="playersList" class="muted">Connecte-toi pour consulter la communauté.</div></div></section>
-<section id="results" class="section"><div class="card"><h2>Soumettre un résultat DLS</h2><p class="muted">Les résultats envoyés restent en attente jusqu’à validation par l’administrateur.</p>
-<div class="row"><div class="field"><label for="playerTeam">Ton équipe</label><input id="playerTeam" maxlength="60" placeholder="Nom de ton équipe"></div><div class="field"><label for="opponent">Équipe adverse</label><input id="opponent" maxlength="60" placeholder="Nom de l'équipe adverse"></div></div>
-<div class="row"><div class="field"><label for="scoreA">Ton score</label><input id="scoreA" type="number" min="0" max="99"></div><div class="field"><label for="scoreB">Score adverse</label><input id="scoreB" type="number" min="0" max="99"></div></div>
-<h3>Statistiques du match</h3><p class="small muted">Saisis les statistiques affichées dans ton match DLS. Elles seront vérifiées par l'administrateur.</p>
-<div class="row"><div class="field"><label for="possessionA">Possession de ton équipe (%)</label><input id="possessionA" type="number" min="0" max="100" placeholder="Ex. 55"></div><div class="field"><label for="possessionB">Possession adverse (%)</label><input id="possessionB" type="number" min="0" max="100" placeholder="Ex. 45"></div></div>
-<div class="row"><div class="field"><label for="shotsA">Tirs de ton équipe</label><input id="shotsA" type="number" min="0" max="99"></div><div class="field"><label for="shotsB">Tirs adverses</label><input id="shotsB" type="number" min="0" max="99"></div></div>
-<div class="row"><div class="field"><label for="shotsOnA">Tirs cadrés de ton équipe</label><input id="shotsOnA" type="number" min="0" max="99"></div><div class="field"><label for="shotsOnB">Tirs cadrés adverses</label><input id="shotsOnB" type="number" min="0" max="99"></div></div>
-<div class="row"><div class="field"><label for="passesA">Passes réussies de ton équipe</label><input id="passesA" type="number" min="0" max="999"></div><div class="field"><label for="passesB">Passes réussies adverses</label><input id="passesB" type="number" min="0" max="999"></div></div>
-<div class="row"><div class="field"><label for="tacklesA">Tacles de ton équipe</label><input id="tacklesA" type="number" min="0" max="999"></div><div class="field"><label for="tacklesB">Tacles adverses</label><input id="tacklesB" type="number" min="0" max="999"></div></div>
-<div class="field"><label for="matchScreenshot">Capture d'écran du résultat (image JPG, PNG ou WebP)</label><input id="matchScreenshot" type="file" accept="image/jpeg,image/png,image/webp"><span class="small muted">Firebase Storage n'étant pas configuré, la capture est compressée automatiquement pour tenter de respecter la limite Firestore.</span></div>
-<button id="submitResultBtn" type="button">Envoyer le résultat</button><p id="resultMessage" class="small"></p></div>
-<div class="card"><h2>Résultats validés</h2><div id="resultsList" class="muted">Connecte-toi pour voir les résultats.</div></div></section>
+<section id="results" class="section"><div class="card"><h2>Soumettre un résultat DLS</h2><p class="muted">Ajoute le score, les statistiques du match et une capture d’écran. Le résultat sera soumis à validation.</p><div class="row"><div class="field"><label for="opponent">Manager / équipe adverse</label><input id="opponent" maxlength="80" placeholder="Pseudo du manager ou nom de son équipe"></div><div class="field"><label for="scoreA">Tes buts</label><input id="scoreA" type="number" min="0" max="99" inputmode="numeric"></div><div class="field"><label for="scoreB">Buts adverses</label><input id="scoreB" type="number" min="0" max="99" inputmode="numeric"></div></div><h3>Statistiques du match</h3><div class="row"><div class="field"><label for="possession">Possession (%)</label><input id="possession" type="number" min="0" max="100" inputmode="numeric" placeholder="Ex. 58"></div><div class="field"><label for="shots">Tirs</label><input id="shots" type="number" min="0" max="99" inputmode="numeric"></div><div class="field"><label for="shotsOnTarget">Tirs cadrés</label><input id="shotsOnTarget" type="number" min="0" max="99" inputmode="numeric"></div></div><div class="row"><div class="field"><label for="tackles">Tacles / interventions</label><input id="tackles" type="number" min="0" max="99" inputmode="numeric"></div><div class="field"><label for="passes">Passes réussies (%)</label><input id="passes" type="number" min="0" max="100" inputmode="numeric"></div></div><div class="field"><label for="matchImage">Capture d’écran du match (obligatoire)</label><input id="matchImage" type="file" accept="image/*"><span class="small">Image compressée avant enregistrement. Limite : 350 Ko après compression.</span><img id="imagePreview" class="preview hidden" alt="Aperçu de la capture"></div><button id="submitResultBtn">Envoyer le résultat</button><p id="resultMessage" class="small"></p></div><div class="card"><h2>Résultats validés</h2><p class="small muted">Les statistiques restent masquées jusqu’au clic sur « Voir les statistiques ».</p><div id="resultsList" class="muted">Connecte-toi pour voir les résultats.</div></div></section>
 <section id="team" class="section"><div class="card"><h2>Équipe type</h2><p class="muted">La sélection sera publiée ici après la mise en place des statistiques et des critères.</p></div></section><section id="awards" class="section"><div class="card"><h2>Distinctions</h2><p class="muted">Meilleur joueur, buteur, passeur, meilleure défense et meilleure attaque : les distinctions apparaîtront ici lorsque les données officielles seront disponibles.</p></div></section><section id="sponsors" class="section"><div class="card"><h2>Nos sponsors</h2><p class="muted">L’espace sponsors sera complété par l’organisateur.</p></div></section>
 <section id="admin" class="section"><div class="card"><h2>Espace administrateur</h2><div class="notice">Compte administrateur reconnu. Les actions sont contrôlées par les règles Firestore.</div></div><div class="grid"><div class="card"><div class="muted">Joueurs</div><div class="stat" id="adminPlayersCount">—</div></div><div class="card"><div class="muted">Publications</div><div class="stat" id="adminPostsCount">—</div></div><div class="card"><div class="muted">Résultats en attente</div><div class="stat" id="adminPendingCount">—</div></div></div><div class="card"><h2>Gestion des résultats</h2><div id="adminResultsList">Chargement…</div></div><div class="card"><h2>Modération du forum</h2><div id="adminPostsList">Chargement…</div></div><div class="card"><h2>Gestion des joueurs</h2><p class="small muted">Supprimer un profil Firestore ne supprime pas le compte Firebase Authentication.</p><div id="adminUsersList">Chargement…</div></div><p id="adminMessage" class="small"></p></section>
 </main><footer><div class="wrap">DLS Forum Players · Communauté indépendante de joueurs Dream League Soccer.</div></footer>
-<div class="modal" id="authModal"><div class="box"><div class="modalhead"><h2 id="modalTitle">Créer un compte</h2><button class="close" id="closeModal" type="button" aria-label="Fermer">×</button></div><form id="authForm"><div id="nameField" class="field"><label for="name">Nom du joueur</label><input id="name" maxlength="60" autocomplete="name"></div><div id="teamField" class="field"><label for="teamName">Nom de l'équipe</label><input id="teamName" maxlength="60" autocomplete="organization"></div><div class="field"><label for="email">Adresse e-mail</label><input id="email" type="email" autocomplete="email" required></div><div class="field"><label for="password">Mot de passe</label><input id="password" type="password" minlength="6" autocomplete="current-password" required></div><button id="authSubmit" type="submit">Créer mon compte</button><p id="authMessage" class="small"></p></form><p class="small">Le mot de passe est géré par Firebase Authentication et n’est pas enregistré dans le profil Firestore.</p></div></div>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script>
-(function(){
-  const firebaseConfig={apiKey:"AIzaSyBZAKwOcy_UdZYlxvmgBYI22bvHNGQmURo",authDomain:"dls-forum-players.firebaseapp.com",projectId:"dls-forum-players",storageBucket:"dls-forum-players.firebasestorage.app",messagingSenderId:"161092611096",appId:"1:161092611096:web:9ecca0e756c77017f5a76d"};
-  const ADMIN_UID="IYDvWC2FJSZFFUEY9EyZ4kWWLMr2";
-
-  const $=id=>document.getElementById(id);
-  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  const safeImgSrc=src=>typeof src==="string"&&src.startsWith("data:image/")?src:"";
-  function say(id,t){const el=$(id);if(el)el.textContent=t;}
-
-  let app=null,auth=null,db=null,firebaseReady=false,firebaseInitError="";
-  try{
-    if(!window.firebase)throw new Error("SDK Firebase non chargé.");
-    app=firebase.apps.length?firebase.app():firebase.initializeApp(firebaseConfig);
-    auth=firebase.auth();
-    db=firebase.firestore();
-    firebaseReady=true;
-  }catch(err){
-    firebaseInitError=err.message||"Erreur d'initialisation Firebase.";
-  }
-
-  let currentUser=null,profile=null,unsubs=[],adminUnsubs=[];
-  window.__dlsResultCache={};
-  const isAdmin=()=>!!currentUser&&currentUser.uid===ADMIN_UID;
-
-  function applyLoggedInUI(user,prof){
-    currentUser=user;
-    profile=prof||{name:user.email,team:""};
-    const isAdm=!!user&&user.uid===ADMIN_UID;
-    if($("accountLabel"))$("accountLabel").textContent=(profile.name||user.email)+" · "+(isAdm?"Administrateur":profile.team||"Joueur");
-    if(profile.team&&$("playerTeam")&&!$("playerTeam").value)$("playerTeam").value=profile.team;
-    if($("loginBtn"))$("loginBtn").classList.add("hidden");
-    if($("registerBtn"))$("registerBtn").classList.add("hidden");
-    if($("logoutBtn"))$("logoutBtn").classList.remove("hidden");
-    if($("adminNav"))$("adminNav").classList.toggle("hidden",!isAdm);
-  }
-
-  function applyLoggedOutUI(){
-    currentUser=null;
-    profile=null;
-    if($("accountLabel"))$("accountLabel").textContent="Non connecté";
-    if($("loginBtn"))$("loginBtn").classList.remove("hidden");
-    if($("registerBtn"))$("registerBtn").classList.remove("hidden");
-    if($("logoutBtn"))$("logoutBtn").classList.add("hidden");
-    if($("adminNav"))$("adminNav").classList.add("hidden");
-    if($("postsList"))$("postsList").textContent="Connecte-toi pour voir les publications.";
-    if($("playersList"))$("playersList").textContent="Connecte-toi pour consulter la communauté.";
-    if($("resultsList"))$("resultsList").textContent="Connecte-toi pour voir les résultats.";
-    if($("statPlayers"))$("statPlayers").textContent="—";
-    if($("statPosts"))$("statPosts").textContent="—";
-    if($("statResults"))$("statResults").textContent="—";
-  }
-
-  function openAuthModal(mode){
-    const modalEl=$("authModal");
-    if(!modalEl)return;
-    const login=mode==="login";
-    modalEl.classList.add("show");
-    if($("modalTitle"))$("modalTitle").textContent=login?"Connexion":"Créer un compte";
-    if($("authSubmit"))$("authSubmit").textContent=login?"Me connecter":"Créer mon compte";
-    if($("nameField"))$("nameField").classList.toggle("hidden",login);
-    if($("teamField"))$("teamField").classList.toggle("hidden",login);
-    if($("name"))$("name").required=!login;
-    if($("teamName"))$("teamName").required=!login;
-    if($("password"))$("password").autocomplete=login?"current-password":"new-password";
-    say("authMessage",firebaseReady?"":"Attention : "+firebaseInitError);
-  }
-
-  function closeAuthModal(){
-    const modalEl=$("authModal");
-    if(modalEl)modalEl.classList.remove("show");
-  }
-
-  document.addEventListener("click",e=>{
-    const target=e.target;
-    if(!(target instanceof Element))return;
-    if(target.closest("#loginBtn")){openAuthModal("login");return;}
-    if(target.closest("#registerBtn")||target.closest("#heroRegister")){openAuthModal("register");return;}
-    if(target.closest("#closeModal")||target===$("authModal")){closeAuthModal();return;}
-    const navBtn=target.closest("#nav [data-page]");
-    if(navBtn){
-      const page=navBtn.getAttribute("data-page");
-      if(page==="admin"&&!isAdmin()){
-        alert("Accès réservé à l’administrateur.");
-        return;
-      }
-      document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b===navBtn));
-      document.querySelectorAll(".section").forEach(s=>s.classList.toggle("active",s.id===page));
-    }
-  });
-
-  if($("authForm")){
-    $("authForm").addEventListener("submit",async e=>{
-      e.preventDefault();
-      if(!firebaseReady||!auth){
-        say("authMessage","Impossible de contacter Firebase : "+(firebaseInitError||"SDK indisponible."));
-        return;
-      }
-      const email=($("email")?.value||"").trim();
-      const password=$("password")?.value||"";
-      const login=$("nameField")?.classList.contains("hidden")??true;
-      const submitBtn=$("authSubmit");
-      if(submitBtn)submitBtn.disabled=true;
-      say("authMessage",login?"Connexion en cours...":"Création du compte en cours...");
-      try{
-        let cred;
-        if(login){
-          cred=await auth.signInWithEmailAndPassword(email,password);
-        }else{
-          const name=($("name")?.value||"").trim();
-          const team=($("teamName")?.value||"").trim();
-          cred=await auth.createUserWithEmailAndPassword(email,password);
-          if(db&&cred&&cred.user){
-            await db.collection("users").doc(cred.user.uid).set({
-              uid:cred.user.uid,
-              name,
-              team,
-              email,
-              role:"player",
-              createdAt:firebase.firestore.FieldValue.serverTimestamp()
-            });
-          }
-        }
-        if(cred&&cred.user){
-          applyLoggedInUI(cred.user,{name:cred.user.email,team:""});
-        }
-        closeAuthModal();
-        $("authForm").reset();
-        say("authMessage","");
-      }catch(err){
-        const code=err&&err.code?err.code:"";
-        const msg=code==="auth/email-already-in-use"
-          ?"Cette adresse possède déjà un compte."
-          :(code==="auth/invalid-credential"||code==="auth/wrong-password"||code==="auth/user-not-found"||code==="auth/invalid-email")
-            ?"E-mail ou mot de passe incorrect."
-            :code==="auth/weak-password"
-              ?"Mot de passe trop court (6 caractères minimum)."
-              :code==="auth/network-request-failed"
-                ?"Erreur réseau : impossible de joindre Firebase."
-                :((err&&err.message)||"Erreur lors de la connexion.");
-        say("authMessage",msg);
-      }finally{
-        if(submitBtn)submitBtn.disabled=false;
-      }
-    });
-  }
-
-  function stop(){
-    unsubs.forEach(f=>{try{f()}catch(_){}});
-    unsubs=[];
-    adminUnsubs.forEach(f=>{try{f()}catch(_){}});
-    adminUnsubs=[];
-  }
-
-  function listen(ref,cb,id){
-    unsubs.push(ref.onSnapshot(cb,e=>{
-      const el=$(id);
-      if(el)el.textContent="Erreur de lecture : "+e.message;
-    }));
-  }
-
-  function statsMarkup(r,withImage){
-    const rows=[
-      ["Possession",`${r.possessionA??"—"}% – ${r.possessionB??"—"}%`],
-      ["Tirs",`${r.shotsA??"—"} – ${r.shotsB??"—"}`],
-      ["Tirs cadrés",`${r.shotsOnA??"—"} – ${r.shotsOnB??"—"}`],
-      ["Passes réussies",`${r.passesA??"—"} – ${r.passesB??"—"}`],
-      ["Tacles",`${r.tacklesA??"—"} – ${r.tacklesB??"—"}`]
-    ];
-    const imgSrc=withImage?safeImgSrc(r.screenshot):"";
-    return rows.map(x=>`<div>${esc(x[0])} : <b>${esc(x[1])}</b></div>`).join("")+(imgSrc?`<div class="field"><img src="${esc(imgSrc)}" alt="Capture du match" style="max-width:100%;border-radius:9px"></div>`:"");
-  }
-
-  function start(){
-    if(!firebaseReady||!db)return;
-    stop();
-    window.__dlsResultCache={};
-
-    listen(db.collection("posts").orderBy("createdAt","desc").limit(40),s=>{
-      $("postsList").innerHTML=s.empty
-        ?"<p>Aucune publication pour le moment.</p>"
-        :s.docs.map(d=>{
-            const p=d.data();
-            return `<div class="item"><b>${esc(p.name||"Joueur")}</b> <span class="small">· ${esc(p.team||"")}</span><p>${esc(p.text).replace(/\n/g,"<br>")}</p></div>`;
-          }).join("");
-      $("statPosts")
+<div class="modal" id="authModal"><div class="box"><div class="modalhead"><h2 id="modalTitle">Créer un compte</h2><button class="close" id="closeModal">×</button></div><form id="authForm"><div id="nameField" class="field"><label for="name">Nom du joueur</label><input id="name" maxlength="60"></div><div id="teamField" class="field"><label for="teamName">Nom de l'équipe</label><input id="teamName" maxlength="60"></div><div class="field"><label for="email">Adresse e-mail</label><input id="email" type="email" required></div><div class="field"><label for="password">Mot de passe</label><input id="password" type="password" minlength="6" required></div><button id="authSubmit" type="submit">Créer mon compte</button><p id="authMessage" class="small"></p></form><p class="small">Le mot de passe est géré par Firebase Authentication et n’est pas enregistré dans le profil Firestore.</p></div></div>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{getFirestore,doc,setDoc,getDoc,addDoc,collection,query,orderBy,limit,onSnapshot,serverTimestamp,deleteDoc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyBZAKwOcy_UdZYlxvmgBYI22bvHNGQmURo",authDomain:"dls-forum-players.firebaseapp.com",projectId:"dls-forum-players",storageBucket:"dls-forum-players.firebasestorage.app",messagingSenderId:"161092611096",appId:"1:161092611096:web:9ecca0e756c77017f5a76d"};
+const ADMIN_UID="IYDvWC2FJSZFFUEY9EyZ4kWWLMr2";
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);let currentUser=null,profile=null,unsubs=[],adminUnsubs=[];
+const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const isAdmin=()=>!!currentUser&&currentUser.uid===ADMIN_UID;function say(id,t){$(id).textContent=t}
+function modal(mode){const login=mode==="login";$("authModal").classList.add("show");$("modalTitle").textContent=login?"Connexion":"Créer un compte";$("authSubmit").textContent=login?"Me connecter":"Créer mon compte";$("nameField").classList.toggle("hidden",login);$("teamField").classList.toggle("hidden",login);$("name").required=!login;$("teamName").required=!login;say("authMessage","")}
+function stop(){unsubs.forEach(f=>f());unsubs=[];adminUnsubs.forEach(f=>f());adminUnsubs=[]}
+function listen(ref,cb,id){unsubs.push(onSnapshot(ref,cb,e=>{$(id).textContent="Erreur de lecture : "+e.message}))}
+function readMatchImage(file){return new Promise((resolve,reject)=>{if(!file||!file.type.startsWith("image/")){reject(new Error("Sélectionne une image valide."));return}const reader=new FileReader();reader.onerror=()=>reject(new Error("Lecture de l’image impossible."));reader.onload=()=>{const img=new Image();img.onerror=()=>reject(new Error("Image illisible."));img.onload=()=>{const max=1200,scale=Math.min(1,max/Math.max(img.width,img.height)),canvas=document.createElement("canvas");canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);let q=.78,data=canvas.toDataURL("image/jpeg",q);while(data.length>350*1024*4/3&&q>.35){q-=.07;data=canvas.toDataURL("image/jpeg",q)}if(data.length>350*1024*4/3)reject(new Error("Cette image est trop volumineuse. Choisis une capture plus petite."));else resolve(data)};img.src=reader.result};reader.readAsDataURL(file)})}
+function statsMarkup(r,id){const st=r.stats||{};return `<div class="stats-detail hidden" id="stats-${id}"><div class="small">Possession : ${Number(st.possession??0)} % · Tirs : ${Number(st.shots??0)} · Tirs cadrés : ${Number(st.shotsOnTarget??0)}<br>Tacles : ${Number(st.tackles??0)} · Passes réussies : ${Number(st.passes??0)} %</div>${r.screenshot?`<img class="preview" src="${r.screenshot}" alt="Capture du match">`:'<p class="small">Aucune capture disponible.</p>'}</div>`}
+window.toggleStats=id=>{const el=$("stats-"+id);if(el)el.classList.toggle("hidden")};
+function start(){stop();listen(query(collection(db,"posts"),orderBy("createdAt","desc"),limit(40)),s=>{$("postsList").innerHTML=s.empty?"<p>Aucune publication pour le moment.</p>":s.docs.map(d=>{let p=d.data();return `<div class="item"><b>${esc(p.name||"Joueur")}</b> <span class="small">· ${esc(p.team||"")}</span><p>${esc(p.text).replace(/\n/g,"<br>")}</p></div>`}).join("");$("statPosts").textContent=s.size},"postsList");listen(query(collection(db,"users"),limit(100)),s=>{$("playersList").innerHTML=s.empty?"Aucun joueur inscrit.":s.docs.map(d=>{let p=d.data();return `<div class="item"><b>${esc(p.name||"Joueur")}</b><div class="small">${esc(p.team||"Équipe non précisée")}</div></div>`}).join("");$("statPlayers").textContent=s.size},"playersList");listen(query(collection(db,"results"),orderBy("createdAt","desc"),limit(40)),s=>{const approved=s.docs.filter(d=>(d.data().status||"pending")==="approved");$("resultsList").innerHTML=approved.length?approved.map(d=>{let r=d.data();return `<div class="item"><b>${esc(r.team||"Équipe")} ${Number(r.scoreA)} – ${Number(r.scoreB)} ${esc(r.opponent||"Adversaire")}</b><div class="small">Résultat validé · ${r.createdAt?.toDate?r.createdAt.toDate().toLocaleDateString("fr-FR"):""}</div><button class="secondary" onclick="toggleStats('${d.id}')">Voir les statistiques</button>${statsMarkup(r,d.id)}</div>`}).join(""):"Aucun résultat validé pour le moment.";$("statResults").textContent=approved.length},"resultsList");if(isAdmin())startAdmin()}
+function startAdmin(){if(!isAdmin())return;
+adminUnsubs.push(onSnapshot(query(collection(db,"results"),orderBy("createdAt","desc"),limit(100)),s=>{let pending=s.docs.filter(d=>(d.data().status||"pending")==="pending");$("adminPendingCount").textContent=pending.length;$("adminResultsList").innerHTML=s.empty?"Aucun résultat.":s.docs.map(d=>{let r=d.data(),st=r.status||"pending";return `<div class="item"><b>${esc(r.team||"Équipe")} ${Number(r.scoreA)} – ${Number(r.scoreB)} ${esc(r.opponent||"Adversaire")}</b><div class="small">Statut : ${esc(st)} · Possession ${Number(r.stats?.possession??0)} % · Tirs ${Number(r.stats?.shots??0)} · Cadrés ${Number(r.stats?.shotsOnTarget??0)}</div>${r.screenshot?`<a href="${r.screenshot}" target="_blank" rel="noopener">Voir la capture</a>`:"<span class='small'>Sans capture</span>"}${st==="pending"?`<div class="actions"><button data-action="approve" data-id="${d.id}">Valider</button><button class="danger" data-action="reject" data-id="${d.id}">Refuser</button></div>`:""}</div>`}).join("")},e=>say("adminMessage","Erreur résultats : "+e.message)));
+adminUnsubs.push(onSnapshot(query(collection(db,"posts"),orderBy("createdAt","desc"),limit(100)),s=>{$("adminPostsCount").textContent=s.size;$("adminPostsList").innerHTML=s.empty?"Aucune publication.":s.docs.map(d=>{let p=d.data();return `<div class="item"><b>${esc(p.name||"Joueur")}</b><p>${esc(p.text||"")}</p><div class="actions"><button class="danger" data-action="delete-post" data-id="${d.id}">Supprimer</button></div></div>`}).join("")},e=>say("adminMessage","Erreur forum : "+e.message)));
+adminUnsubs.push(onSnapshot(query(collection(db,"users"),limit(100)),s=>{$("adminPlayersCount").textContent=s.size;$("adminUsersList").innerHTML=s.empty?"Aucun profil.":s.docs.map(d=>{let p=d.data();return `<div class="item"><b>${esc(p.name||"Joueur")}</b><div class="small">${esc(p.team||"Équipe non précisée")} · ${esc(p.email||"")}</div>${d.id!==ADMIN_UID?`<div class="actions"><button class="danger" data-action="delete-user" data-id="${d.id}">Supprimer le profil</button></div>`:"<span class='tag'>Administrateur</span>"}</div>`}).join("")},e=>say("adminMessage","Erreur joueurs : "+e.message)))}
+$("nav").onclick=e=>{let b=e.target.closest("[data-page]");if(!b)return;if(b.dataset.page==="admin"&&!isAdmin()){alert("Accès réservé à l’administrateur.");return}document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".section").forEach(x=>x.classList.toggle("active",x.id===b.dataset.page))};
+$("loginBtn").onclick=()=>modal("login");$("registerBtn").onclick=()=>modal("register");$("heroRegister").onclick=()=>modal("register");$("closeModal").onclick=()=>$("authModal").classList.remove("show");$("logoutBtn").onclick=()=>signOut(auth);
+$("authForm").onsubmit=async e=>{e.preventDefault();let email=$("email").value.trim(),password=$("password").value,login=$("nameField").classList.contains("hidden");$("authSubmit").disabled=true;say("authMessage","Traitement en cours...");try{if(login)await signInWithEmailAndPassword(auth,email,password);else{let name=$("name").value.trim(),team=$("teamName").value.trim(),cred=await createUserWithEmailAndPassword(auth,email,password);await setDoc(doc(db,"users",cred.user.uid),{uid:cred.user.uid,name,team,email,role:"player",createdAt:serverTimestamp()})}$("authModal").classList.remove("show");$("authForm").reset()}catch(e){say("authMessage",e.code==="auth/email-already-in-use"?"Cette adresse possède déjà un compte.":e.code==="auth/invalid-credential"?"E-mail ou mot de passe incorrect.":e.message)}finally{$("authSubmit").disabled=false}};
+onAuthStateChanged(auth,async user=>{currentUser=user;profile=null;stop();$("adminNav").classList.toggle("hidden",!isAdmin());if(user){try{let s=await getDoc(doc(db,"users",user.uid));profile=s.exists()?s.data():{name:user.email,team:""};$("accountLabel").textContent=(profile.name||user.email)+" · "+(isAdmin()?"Administrateur":profile.team||"Joueur");$("loginBtn").classList.add("hidden");$("registerBtn").classList.add("hidden");$("logoutBtn").classList.remove("hidden");$("adminNav").classList.toggle("hidden",!isAdmin());start()}catch(e){$("accountLabel").textContent="Connecté · profil indisponible";console.error(e)}}else{$("accountLabel").textContent="Non connecté";$("loginBtn").classList.remove("hidden");$("registerBtn").classList.remove("hidden");$("logoutBtn").classList.add("hidden");$("adminNav").classList.add("hidden");$("postsList").textContent="Connecte-toi pour voir les publications.";$("playersList").textContent="Connecte-toi pour consulter la communauté.";$("resultsList").textContent="Connecte-toi pour voir les résultats.";$("statPlayers").text
