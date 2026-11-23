@@ -39,34 +39,62 @@
 
   let app=null,auth=null,db=null,firebaseReady=false,firebaseInitError="";
   try{
-    if(!window.firebase)throw new Error("Les scripts Firebase n'ont pas pu être chargés (vérifie ta connexion internet).");
+    if(!window.firebase)throw new Error("SDK Firebase non chargé.");
     app=firebase.apps.length?firebase.app():firebase.initializeApp(firebaseConfig);
     auth=firebase.auth();
     db=firebase.firestore();
     firebaseReady=true;
   }catch(err){
     firebaseInitError=err.message||"Erreur d'initialisation Firebase.";
-    console.error(err);
   }
 
   let currentUser=null,profile=null,unsubs=[],adminUnsubs=[];
   window.__dlsResultCache={};
   const isAdmin=()=>!!currentUser&&currentUser.uid===ADMIN_UID;
 
+  function applyLoggedInUI(user,prof){
+    currentUser=user;
+    profile=prof||{name:user.email,team:""};
+    const isAdm=!!user&&user.uid===ADMIN_UID;
+    if($("accountLabel"))$("accountLabel").textContent=(profile.name||user.email)+" · "+(isAdm?"Administrateur":profile.team||"Joueur");
+    if(profile.team&&$("playerTeam")&&!$("playerTeam").value)$("playerTeam").value=profile.team;
+    if($("loginBtn"))$("loginBtn").classList.add("hidden");
+    if($("registerBtn"))$("registerBtn").classList.add("hidden");
+    if($("logoutBtn"))$("logoutBtn").classList.remove("hidden");
+    if($("adminNav"))$("adminNav").classList.toggle("hidden",!isAdm);
+  }
+
+  function applyLoggedOutUI(){
+    currentUser=null;
+    profile=null;
+    if($("accountLabel"))$("accountLabel").textContent="Non connecté";
+    if($("loginBtn"))$("loginBtn").classList.remove("hidden");
+    if($("registerBtn"))$("registerBtn").classList.remove("hidden");
+    if($("logoutBtn"))$("logoutBtn").classList.add("hidden");
+    if($("adminNav"))$("adminNav").classList.add("hidden");
+    if($("postsList"))$("postsList").textContent="Connecte-toi pour voir les publications.";
+    if($("playersList"))$("playersList").textContent="Connecte-toi pour consulter la communauté.";
+    if($("resultsList"))$("resultsList").textContent="Connecte-toi pour voir les résultats.";
+    if($("statPlayers"))$("statPlayers").textContent="—";
+    if($("statPosts"))$("statPosts").textContent="—";
+    if($("statResults"))$("statResults").textContent="—";
+  }
+
   function openAuthModal(mode){
     const modalEl=$("authModal");
     if(!modalEl)return;
     const login=mode==="login";
     modalEl.classList.add("show");
-    $("modalTitle").textContent=login?"Connexion":"Créer un compte";
-    $("authSubmit").textContent=login?"Me connecter":"Créer mon compte";
-    $("nameField").classList.toggle("hidden",login);
-    $("teamField").classList.toggle("hidden",login);
-    $("name").required=!login;
-    $("teamName").required=!login;
-    $("password").autocomplete=login?"current-password":"new-password";
-    say("authMessage",firebaseReady?"":firebaseInitError);
+    if($("modalTitle"))$("modalTitle").textContent=login?"Connexion":"Créer un compte";
+    if($("authSubmit"))$("authSubmit").textContent=login?"Me connecter":"Créer mon compte";
+    if($("nameField"))$("nameField").classList.toggle("hidden",login);
+    if($("teamField"))$("teamField").classList.toggle("hidden",login);
+    if($("name"))$("name").required=!login;
+    if($("teamName"))$("teamName").required=!login;
+    if($("password"))$("password").autocomplete=login?"current-password":"new-password";
+    say("authMessage",firebaseReady?"":"Attention : "+firebaseInitError);
   }
+
   function closeAuthModal(){
     const modalEl=$("authModal");
     if(modalEl)modalEl.classList.remove("show");
@@ -90,46 +118,65 @@
     }
   });
 
-  $("authForm").addEventListener("submit",async e=>{
-    e.preventDefault();
-    if(!firebaseReady){
-      say("authMessage",firebaseInitError||"Firebase n'est pas disponible.");
+  async function handleAuthSubmit(e){
+    if(e&&e.preventDefault)e.preventDefault();
+    if(!firebaseReady||!auth){
+      say("authMessage","Impossible de contacter Firebase : "+(firebaseInitError||"SDK indisponible."));
       return;
     }
-    const email=$("email").value.trim();
-    const password=$("password").value;
-    const login=$("nameField").classList.contains("hidden");
-    $("authSubmit").disabled=true;
-    say("authMessage","Connexion en cours...");
+    const email=($("email")?.value||"").trim();
+    const password=$("password")?.value||"";
+    const login=$("nameField")?.classList.contains("hidden")??true;
+    const submitBtn=$("authSubmit");
+    if(submitBtn)submitBtn.disabled=true;
+    say("authMessage",login?"Connexion en cours...":"Création du compte en cours...");
     try{
+      let cred;
       if(login){
-        await auth.signInWithEmailAndPassword(email,password);
+        cred=await auth.signInWithEmailAndPassword(email,password);
       }else{
-        const name=$("name").value.trim();
-        const team=$("teamName").value.trim();
-        const cred=await auth.createUserWithEmailAndPassword(email,password);
-        await db.collection("users").doc(cred.user.uid).set({
-          uid:cred.user.uid,
-          name,
-          team,
-          email,
-          role:"player",
-          createdAt:firebase.firestore.FieldValue.serverTimestamp()
-        });
+        const name=($("name")?.value||"").trim();
+        const team=($("teamName")?.value||"").trim();
+        cred=await auth.createUserWithEmailAndPassword(email,password);
+        if(db&&cred&&cred.user){
+          await db.collection("users").doc(cred.user.uid).set({
+            uid:cred.user.uid,
+            name,
+            team,
+            email,
+            role:"player",
+            createdAt:firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+      }
+      if(cred&&cred.user){
+        applyLoggedInUI(cred.user,{name:cred.user.email,team:""});
       }
       closeAuthModal();
-      $("authForm").reset();
+      if($("authForm"))$("authForm").reset();
+      say("authMessage","");
     }catch(err){
-      const msg=err.code==="auth/email-already-in-use"
+      const code=err&&err.code?err.code:"";
+      const msg=code==="auth/email-already-in-use"
         ?"Cette adresse possède déjà un compte."
-        :(err.code==="auth/invalid-credential"||err.code==="auth/wrong-password"||err.code==="auth/user-not-found")
+        :(code==="auth/invalid-credential"||code==="auth/wrong-password"||code==="auth/user-not-found"||code==="auth/invalid-email")
           ?"E-mail ou mot de passe incorrect."
-          :err.code==="auth/network-request-failed"
-            ?"Erreur réseau : impossible de joindre Firebase."
-            :err.message;
+          :code==="auth/weak-password"
+            ?"Mot de passe trop court (6 caractères minimum)."
+            :code==="auth/network-request-failed"
+              ?"Erreur réseau : impossible de joindre Firebase."
+              :((err&&err.message)||"Erreur lors de la connexion.");
       say("authMessage",msg);
     }finally{
-      $("authSubmit").disabled=false;
+      if(submitBtn)submitBtn.disabled=false;
+    }
+  }
+
+  if($("authForm"))$("authForm").addEventListener("submit",handleAuthSubmit);
+  if($("authSubmit"))$("authSubmit").addEventListener("click",e=>{
+    if($("authForm")&&typeof $("authForm").requestSubmit==="function"){
+      e.preventDefault();
+      $("authForm").requestSubmit();
     }
   });
 
@@ -170,60 +217,4 @@
         ?"<p>Aucune publication pour le moment.</p>"
         :s.docs.map(d=>{
             const p=d.data();
-            return `<div class="item"><b>${esc(p.name||"Joueur")}</b> <span class="small">· ${esc(p.team||"")}</span><p>${esc(p.text).replace(/\n/g,"<br>")}</p></div>`;
-          }).join("");
-      $("statPosts").textContent=s.size;
-    },"postsList");
-
-    listen(db.collection("users").limit(100),s=>{
-      $("playersList").innerHTML=s.empty
-        ?"Aucun joueur inscrit."
-        :s.docs.map(d=>{
-            const p=d.data();
-            return `<div class="item"><b>${esc(p.name||"Joueur")}</b><div class="small">${esc(p.team||"Équipe non précisée")}</div></div>`;
-          }).join("");
-      $("statPlayers").textContent=s.size;
-    },"playersList");
-
-    listen(db.collection("results").orderBy("createdAt","desc").limit(60),s=>{
-      const approvedDocs=s.docs.filter(d=>(d.data().status||"pending")==="approved");
-      $("statResults").textContent=approvedDocs.length;
-      if(!approvedDocs.length){
-        $("resultsList").innerHTML="<p class='muted'>Aucun résultat validé pour le moment.</p>";
-        return;
-      }
-      $("resultsList").innerHTML=approvedDocs.map(d=>{
-        const r=d.data();
-        window.__dlsResultCache[d.id]=r;
-        return `<div class="item"><b>${esc(r.team||"Équipe")} ${Number(r.scoreA)} – ${Number(r.scoreB)} ${esc(r.opponent||"Adversaire")}</b> <span class="tag">Validé</span><div class="actions"><button type="button" class="secondary" data-stats="${esc(d.id)}">Voir les statistiques</button></div><div id="stats-${esc(d.id)}" class="hidden small stats-panel"></div></div>`;
-      }).join("");
-    },"resultsList");
-
-    if(isAdmin())startAdmin();
-  }
-
-  $("resultsList").onclick=e=>{
-    const b=e.target.closest("[data-stats]");
-    if(!b)return;
-    const id=b.dataset.stats;
-    const box=$("stats-"+id);
-    const r=window.__dlsResultCache?.[id];
-    if(!r||!box)return;
-    box.classList.toggle("hidden");
-    if(!box.dataset.loaded){
-      box.innerHTML=statsMarkup(r,true);
-      box.dataset.loaded="1";
-    }
-  };
-
-  function startAdmin(){
-    if(!isAdmin())return;
-
-    adminUnsubs.push(db.collection("results").orderBy("createdAt","desc").limit(100).onSnapshot(s=>{
-      const pending=s.docs.filter(d=>(d.data().status||"pending")==="pending");
-      $("adminPendingCount").textContent=pending.length;
-      $("adminResultsList").innerHTML=s.empty
-        ?"Aucun résultat."
-        :s.docs.map(d=>{
-            const r=d.data(),st=r.status||"pending";
-            const stLabel=st==="pending"?"En attente":st==="
+            return `<div class="i
