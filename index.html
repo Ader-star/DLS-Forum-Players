@@ -23,29 +23,54 @@
 <section id="admin" class="section"><div class="card"><h2>Espace administrateur</h2><div class="notice">Compte administrateur reconnu. Les actions sont contrôlées par les règles Firestore.</div></div><div class="grid"><div class="card"><div class="muted">Joueurs</div><div class="stat" id="adminPlayersCount">—</div></div><div class="card"><div class="muted">Publications</div><div class="stat" id="adminPostsCount">—</div></div><div class="card"><div class="muted">Résultats en attente</div><div class="stat" id="adminPendingCount">—</div></div></div><div class="card"><h2>Gestion des résultats</h2><div id="adminResultsList">Chargement…</div></div><div class="card"><h2>Modération du forum</h2><div id="adminPostsList">Chargement…</div></div><div class="card"><h2>Gestion des joueurs</h2><p class="small muted">Supprimer un profil Firestore ne supprime pas le compte Firebase Authentication.</p><div id="adminUsersList">Chargement…</div></div><p id="adminMessage" class="small"></p></section>
 </main><footer><div class="wrap">DLS Forum Players · Communauté indépendante de joueurs Dream League Soccer.</div></footer>
 <div class="modal" id="authModal"><div class="box"><div class="modalhead"><h2 id="modalTitle">Créer un compte</h2><button class="close" id="closeModal" type="button" aria-label="Fermer">×</button></div><form id="authForm"><div id="nameField" class="field"><label for="name">Nom du joueur</label><input id="name" maxlength="60" autocomplete="name"></div><div id="teamField" class="field"><label for="teamName">Nom de l'équipe</label><input id="teamName" maxlength="60" autocomplete="organization"></div><div class="field"><label for="email">Adresse e-mail</label><input id="email" type="email" autocomplete="email" required></div><div class="field"><label for="password">Mot de passe</label><input id="password" type="password" minlength="6" autocomplete="current-password" required></div><button id="authSubmit" type="submit">Créer mon compte</button><p id="authMessage" class="small"></p></form><p class="small">Le mot de passe est géré par Firebase Authentication et n’est pas enregistré dans le profil Firestore.</p></div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 (function(){
+  const firebaseConfig={apiKey:"AIzaSyBZAKwOcy_UdZYlxvmgBYI22bvHNGQmURo",authDomain:"dls-forum-players.firebaseapp.com",projectId:"dls-forum-players",storageBucket:"dls-forum-players.firebasestorage.app",messagingSenderId:"161092611096",appId:"1:161092611096:web:9ecca0e756c77017f5a76d"};
+  const ADMIN_UID="IYDvWC2FJSZFFUEY9EyZ4kWWLMr2";
+
   const $=id=>document.getElementById(id);
+  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const safeImgSrc=src=>typeof src==="string"&&src.startsWith("data:image/")?src:"";
+  function say(id,t){const el=$(id);if(el)el.textContent=t;}
+
+  let app=null,auth=null,db=null,firebaseReady=false,firebaseInitError="";
+  try{
+    if(!window.firebase)throw new Error("Les scripts Firebase n'ont pas pu être chargés (vérifie ta connexion internet).");
+    app=firebase.apps.length?firebase.app():firebase.initializeApp(firebaseConfig);
+    auth=firebase.auth();
+    db=firebase.firestore();
+    firebaseReady=true;
+  }catch(err){
+    firebaseInitError=err.message||"Erreur d'initialisation Firebase.";
+    console.error(err);
+  }
+
+  let currentUser=null,profile=null,unsubs=[],adminUnsubs=[];
+  window.__dlsResultCache={};
+  const isAdmin=()=>!!currentUser&&currentUser.uid===ADMIN_UID;
+
   function openAuthModal(mode){
     const modalEl=$("authModal");
     if(!modalEl)return;
     const login=mode==="login";
     modalEl.classList.add("show");
-    if($("modalTitle"))$("modalTitle").textContent=login?"Connexion":"Créer un compte";
-    if($("authSubmit"))$("authSubmit").textContent=login?"Me connecter":"Créer mon compte";
-    if($("nameField"))$("nameField").classList.toggle("hidden",login);
-    if($("teamField"))$("teamField").classList.toggle("hidden",login);
-    if($("name"))$("name").required=!login;
-    if($("teamName"))$("teamName").required=!login;
-    if($("password"))$("password").autocomplete=login?"current-password":"new-password";
-    if($("authMessage"))$("authMessage").textContent="";
+    $("modalTitle").textContent=login?"Connexion":"Créer un compte";
+    $("authSubmit").textContent=login?"Me connecter":"Créer mon compte";
+    $("nameField").classList.toggle("hidden",login);
+    $("teamField").classList.toggle("hidden",login);
+    $("name").required=!login;
+    $("teamName").required=!login;
+    $("password").autocomplete=login?"current-password":"new-password";
+    say("authMessage",firebaseReady?"":firebaseInitError);
   }
   function closeAuthModal(){
     const modalEl=$("authModal");
     if(modalEl)modalEl.classList.remove("show");
   }
-  window.__openAuthModal=openAuthModal;
-  window.__closeAuthModal=closeAuthModal;
 
   document.addEventListener("click",e=>{
     const target=e.target;
@@ -56,7 +81,7 @@
     const navBtn=target.closest("#nav [data-page]");
     if(navBtn){
       const page=navBtn.getAttribute("data-page");
-      if(page==="admin"&&!window.__isAdmin?.()){
+      if(page==="admin"&&!isAdmin()){
         alert("Accès réservé à l’administrateur.");
         return;
       }
@@ -64,138 +89,141 @@
       document.querySelectorAll(".section").forEach(s=>s.classList.toggle("active",s.id===page));
     }
   });
-})();
-</script>
-<script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import{getFirestore,doc,setDoc,getDoc,addDoc,collection,query,orderBy,limit,onSnapshot,serverTimestamp,deleteDoc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const firebaseConfig={apiKey:"AIzaSyBZAKwOcy_UdZYlxvmgBYI22bvHNGQmURo",authDomain:"dls-forum-players.firebaseapp.com",projectId:"dls-forum-players",storageBucket:"dls-forum-players.firebasestorage.app",messagingSenderId:"161092611096",appId:"1:161092611096:web:9ecca0e756c77017f5a76d"};
-const ADMIN_UID="IYDvWC2FJSZFFUEY9EyZ4kWWLMr2";
-
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
-let currentUser=null,profile=null,unsubs=[],adminUnsubs=[];
-window.__dlsResultCache={};
-
-const $=id=>document.getElementById(id);
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const isAdmin=()=>!!currentUser&&currentUser.uid===ADMIN_UID;
-window.__isAdmin=isAdmin;
-const safeImgSrc=src=>typeof src==="string"&&src.startsWith("data:image/")?src:"";
-
-function say(id,t){const el=$(id);if(el)el.textContent=t}
-
-function stop(){
-  unsubs.forEach(f=>{try{f()}catch(_){}});
-  unsubs=[];
-  adminUnsubs.forEach(f=>{try{f()}catch(_){}});
-  adminUnsubs=[];
-}
-
-function listen(ref,cb,id){
-  unsubs.push(onSnapshot(ref,cb,e=>{
-    const el=$(id);
-    if(el)el.textContent="Erreur de lecture : "+e.message;
-  }));
-}
-
-function statsMarkup(r,withImage){
-  const rows=[
-    ["Possession",`${r.possessionA??"—"}% – ${r.possessionB??"—"}%`],
-    ["Tirs",`${r.shotsA??"—"} – ${r.shotsB??"—"}`],
-    ["Tirs cadrés",`${r.shotsOnA??"—"} – ${r.shotsOnB??"—"}`],
-    ["Passes réussies",`${r.passesA??"—"} – ${r.passesB??"—"}`],
-    ["Tacles",`${r.tacklesA??"—"} – ${r.tacklesB??"—"}`]
-  ];
-  const imgSrc=withImage?safeImgSrc(r.screenshot):"";
-  return rows.map(x=>`<div>${esc(x[0])} : <b>${esc(x[1])}</b></div>`).join("")+(imgSrc?`<div class="field"><img src="${esc(imgSrc)}" alt="Capture du match" style="max-width:100%;border-radius:9px"></div>`:"");
-}
-
-function start(){
-  stop();
-  window.__dlsResultCache={};
-
-  listen(query(collection(db,"posts"),orderBy("createdAt","desc"),limit(40)),s=>{
-    $("postsList").innerHTML=s.empty
-      ?"<p>Aucune publication pour le moment.</p>"
-      :s.docs.map(d=>{
-          const p=d.data();
-          return `<div class="item"><b>${esc(p.name||"Joueur")}</b> <span class="small">· ${esc(p.team||"")}</span><p>${esc(p.text).replace(/\n/g,"<br>")}</p></div>`;
-        }).join("");
-    $("statPosts").textContent=s.size;
-  },"postsList");
-
-  listen(query(collection(db,"users"),limit(100)),s=>{
-    $("playersList").innerHTML=s.empty
-      ?"Aucun joueur inscrit."
-      :s.docs.map(d=>{
-          const p=d.data();
-          return `<div class="item"><b>${esc(p.name||"Joueur")}</b><div class="small">${esc(p.team||"Équipe non précisée")}</div></div>`;
-        }).join("");
-    $("statPlayers").textContent=s.size;
-  },"playersList");
-
-  listen(query(collection(db,"results"),orderBy("createdAt","desc"),limit(60)),s=>{
-    const approvedDocs=s.docs.filter(d=>(d.data().status||"pending")==="approved");
-    $("statResults").textContent=approvedDocs.length;
-    if(!approvedDocs.length){
-      $("resultsList").innerHTML="<p class='muted'>Aucun résultat validé pour le moment.</p>";
+  $("authForm").addEventListener("submit",async e=>{
+    e.preventDefault();
+    if(!firebaseReady){
+      say("authMessage",firebaseInitError||"Firebase n'est pas disponible.");
       return;
     }
-    $("resultsList").innerHTML=approvedDocs.map(d=>{
-      const r=d.data();
-      window.__dlsResultCache[d.id]=r;
-      return `<div class="item"><b>${esc(r.team||"Équipe")} ${Number(r.scoreA)} – ${Number(r.scoreB)} ${esc(r.opponent||"Adversaire")}</b> <span class="tag">Validé</span><div class="actions"><button type="button" class="secondary" data-stats="${esc(d.id)}">Voir les statistiques</button></div><div id="stats-${esc(d.id)}" class="hidden small stats-panel"></div></div>`;
-    }).join("");
-  },"resultsList");
+    const email=$("email").value.trim();
+    const password=$("password").value;
+    const login=$("nameField").classList.contains("hidden");
+    $("authSubmit").disabled=true;
+    say("authMessage","Connexion en cours...");
+    try{
+      if(login){
+        await auth.signInWithEmailAndPassword(email,password);
+      }else{
+        const name=$("name").value.trim();
+        const team=$("teamName").value.trim();
+        const cred=await auth.createUserWithEmailAndPassword(email,password);
+        await db.collection("users").doc(cred.user.uid).set({
+          uid:cred.user.uid,
+          name,
+          team,
+          email,
+          role:"player",
+          createdAt:firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+      closeAuthModal();
+      $("authForm").reset();
+    }catch(err){
+      const msg=err.code==="auth/email-already-in-use"
+        ?"Cette adresse possède déjà un compte."
+        :(err.code==="auth/invalid-credential"||err.code==="auth/wrong-password"||err.code==="auth/user-not-found")
+          ?"E-mail ou mot de passe incorrect."
+          :err.code==="auth/network-request-failed"
+            ?"Erreur réseau : impossible de joindre Firebase."
+            :err.message;
+      say("authMessage",msg);
+    }finally{
+      $("authSubmit").disabled=false;
+    }
+  });
 
-  if(isAdmin())startAdmin();
-}
+  if(!firebaseReady)return;
 
-$("resultsList").onclick=e=>{
-  const b=e.target.closest("[data-stats]");
-  if(!b)return;
-  const id=b.dataset.stats;
-  const box=$("stats-"+id);
-  const r=window.__dlsResultCache?.[id];
-  if(!r||!box)return;
-  box.classList.toggle("hidden");
-  if(!box.dataset.loaded){
-    box.innerHTML=statsMarkup(r,true);
-    box.dataset.loaded="1";
+  function stop(){
+    unsubs.forEach(f=>{try{f()}catch(_){}});
+    unsubs=[];
+    adminUnsubs.forEach(f=>{try{f()}catch(_){}});
+    adminUnsubs=[];
   }
-};
 
-function startAdmin(){
-  if(!isAdmin())return;
+  function listen(ref,cb,id){
+    unsubs.push(ref.onSnapshot(cb,e=>{
+      const el=$(id);
+      if(el)el.textContent="Erreur de lecture : "+e.message;
+    }));
+  }
 
-  adminUnsubs.push(onSnapshot(query(collection(db,"results"),orderBy("createdAt","desc"),limit(100)),s=>{
-    const pending=s.docs.filter(d=>(d.data().status||"pending")==="pending");
-    $("adminPendingCount").textContent=pending.length;
-    $("adminResultsList").innerHTML=s.empty
-      ?"Aucun résultat."
-      :s.docs.map(d=>{
-          const r=d.data(),st=r.status||"pending";
-          const stLabel=st==="pending"?"En attente":st==="approved"?"Validé":st==="rejected"?"Refusé":st;
-          return `<div class="item"><b>${esc(r.team||"Équipe")} ${Number(r.scoreA)} – ${Number(r.scoreB)} ${esc(r.opponent||"Adversaire")}</b><div class="small">Statut : <span class="tag">${esc(stLabel)}</span></div>${statsMarkup(r,true)}${st==="pending"?`<div class="actions"><button type="button" data-action="approve" data-id="${esc(d.id)}">Valider</button><button type="button" class="danger" data-action="reject" data-id="${esc(d.id)}">Refuser</button></div>`:""}</div>`;
-        }).join("");
-  },e=>say("adminMessage","Erreur résultats : "+e.message)));
+  function statsMarkup(r,withImage){
+    const rows=[
+      ["Possession",`${r.possessionA??"—"}% – ${r.possessionB??"—"}%`],
+      ["Tirs",`${r.shotsA??"—"} – ${r.shotsB??"—"}`],
+      ["Tirs cadrés",`${r.shotsOnA??"—"} – ${r.shotsOnB??"—"}`],
+      ["Passes réussies",`${r.passesA??"—"} – ${r.passesB??"—"}`],
+      ["Tacles",`${r.tacklesA??"—"} – ${r.tacklesB??"—"}`]
+    ];
+    const imgSrc=withImage?safeImgSrc(r.screenshot):"";
+    return rows.map(x=>`<div>${esc(x[0])} : <b>${esc(x[1])}</b></div>`).join("")+(imgSrc?`<div class="field"><img src="${esc(imgSrc)}" alt="Capture du match" style="max-width:100%;border-radius:9px"></div>`:"");
+  }
 
-  adminUnsubs.push(onSnapshot(query(collection(db,"posts"),orderBy("createdAt","desc"),limit(100)),s=>{
-    $("adminPostsCount").textContent=s.size;
-    $("adminPostsList").innerHTML=s.empty
-      ?"Aucune publication."
-      :s.docs.map(d=>{
-          const p=d.data();
-          return `<div class="item"><b>${esc(p.name||"Joueur")}</b><p>${esc(p.text||"")}</p><div class="actions"><button type="button" class="danger" data-action="delete-post" data-id="${esc(d.id)}">Supprimer</button></div></div>`;
-        }).join("");
-  },e=>say("adminMessage","Erreur forum : "+e.message)));
+  function start(){
+    stop();
+    window.__dlsResultCache={};
 
-  adminUnsubs.push(onSnapshot(query(collection(db,"users"),limit(100)),s=>{
-    $("adminPlayersCount").textContent=s.size;
-    $("adminUsersList").innerHTML=s.empty
-      ?"Aucun profil."
-      :s.docs.map(d=>{
-          const p=d.data();
-          return `<div class="item"><b>${esc(p.name||"Joueur")}</b><div class="small">${esc(p.team||"Équipe non précisée")} · ${esc(p.email||"")}</div>${d.id!==ADMIN_UID?`<div class="act
+    listen(db.collection("posts").orderBy("createdAt","desc").limit(40),s=>{
+      $("postsList").innerHTML=s.empty
+        ?"<p>Aucune publication pour le moment.</p>"
+        :s.docs.map(d=>{
+            const p=d.data();
+            return `<div class="item"><b>${esc(p.name||"Joueur")}</b> <span class="small">· ${esc(p.team||"")}</span><p>${esc(p.text).replace(/\n/g,"<br>")}</p></div>`;
+          }).join("");
+      $("statPosts").textContent=s.size;
+    },"postsList");
+
+    listen(db.collection("users").limit(100),s=>{
+      $("playersList").innerHTML=s.empty
+        ?"Aucun joueur inscrit."
+        :s.docs.map(d=>{
+            const p=d.data();
+            return `<div class="item"><b>${esc(p.name||"Joueur")}</b><div class="small">${esc(p.team||"Équipe non précisée")}</div></div>`;
+          }).join("");
+      $("statPlayers").textContent=s.size;
+    },"playersList");
+
+    listen(db.collection("results").orderBy("createdAt","desc").limit(60),s=>{
+      const approvedDocs=s.docs.filter(d=>(d.data().status||"pending")==="approved");
+      $("statResults").textContent=approvedDocs.length;
+      if(!approvedDocs.length){
+        $("resultsList").innerHTML="<p class='muted'>Aucun résultat validé pour le moment.</p>";
+        return;
+      }
+      $("resultsList").innerHTML=approvedDocs.map(d=>{
+        const r=d.data();
+        window.__dlsResultCache[d.id]=r;
+        return `<div class="item"><b>${esc(r.team||"Équipe")} ${Number(r.scoreA)} – ${Number(r.scoreB)} ${esc(r.opponent||"Adversaire")}</b> <span class="tag">Validé</span><div class="actions"><button type="button" class="secondary" data-stats="${esc(d.id)}">Voir les statistiques</button></div><div id="stats-${esc(d.id)}" class="hidden small stats-panel"></div></div>`;
+      }).join("");
+    },"resultsList");
+
+    if(isAdmin())startAdmin();
+  }
+
+  $("resultsList").onclick=e=>{
+    const b=e.target.closest("[data-stats]");
+    if(!b)return;
+    const id=b.dataset.stats;
+    const box=$("stats-"+id);
+    const r=window.__dlsResultCache?.[id];
+    if(!r||!box)return;
+    box.classList.toggle("hidden");
+    if(!box.dataset.loaded){
+      box.innerHTML=statsMarkup(r,true);
+      box.dataset.loaded="1";
+    }
+  };
+
+  function startAdmin(){
+    if(!isAdmin())return;
+
+    adminUnsubs.push(db.collection("results").orderBy("createdAt","desc").limit(100).onSnapshot(s=>{
+      const pending=s.docs.filter(d=>(d.data().status||"pending")==="pending");
+      $("adminPendingCount").textContent=pending.length;
+      $("adminResultsList").innerHTML=s.empty
+        ?"Aucun résultat."
+        :s.docs.map(d=>{
+            const r=d.data(),st=r.status||"pending";
+            const stLabel=st==="pending"?"En attente":st==="
